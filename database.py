@@ -1,3 +1,4 @@
+from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, create_engine, SQLModel
 from typing import Annotated
 from fastapi import Depends
@@ -16,6 +17,8 @@ def get_session():
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
+
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 def create_db_and_tables():
