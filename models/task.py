@@ -70,5 +70,5 @@ class TaskUpdate(BaseModelSerializer, TaskStateValidation):
 
 class TaskCreate(BaseModelSerializer, TaskStateValidation):
     titulo: str
-    descricao: str
+    descricao: str | None = None
     estado: str
