@@ -8,7 +8,3 @@ engine = create_engine(database_url, echo=True)
 start_session = sessionmaker(bind=engine)
 
 db_session = start_session()
-
-
-def migrate_table_if_needs():
-    Base.metadata.create_all(bind=engine)
