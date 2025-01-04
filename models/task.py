@@ -2,8 +2,10 @@
 from enum import Enum
 from datetime import datetime
 from fastapi import HTTPException
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+from models.user import User
 from utils import BaseModelSerializer, get_utc_now
+import models
 
 
 # Cada tarefa deve ter os seguintes campos:
@@ -46,6 +48,7 @@ class PossiveisEstados(str, Enum):
 
 class Task(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
+
     titulo: str
     descricao: str | None = None
     estado: PossiveisEstados
