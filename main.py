@@ -1,10 +1,11 @@
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from pydantic import ValidationError
 from database import create_db_and_tables, SessionDep
 from models.task import ALLOWED_STATE_FILTER, Task, TaskCreate, TaskUpdate
 from sqlmodel import select
-from utils import get_paginated_tasks, get_task_or_404
+from models.user import User, UserCreate, TokenJWT, UserSerializer
+from utils import encode_user, get_paginated_tasks, get_task_or_404, get_current_user
 
 
 def lifespan(app: FastAPI):
@@ -15,8 +16,37 @@ def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+@app.post("/api/auth/token", response_model=TokenJWT)
+def login_user(session: SessionDep, user: UserCreate):
+    validated_data = user.validate_data()
+
+    user_db = session.exec(select(User).where(
+        User.username == validated_data.username).where(User.password == validated_data.password)).first()
+
+    if not user_db:
+        raise HTTPException(status_code=400, detail="Credentials invalidos.")
+
+    token = encode_user(validated_data.model_dump())
+    return TokenJWT(access_token=token, token_type="bearer")
+
+
+@app.post("/api/auth/user")
+def create_users(session: SessionDep, user: UserCreate):
+    validated_data = user.validate_data()
+
+    is_user_already_created = session.exec(select(User).where(
+        User.username == user.username)).first()
+
+    if is_user_already_created:
+        raise HTTPException(status_code=400, detail="Usuário já existe.")
+
+    session.add(validated_data)
+    session.commit()
+    return {"ok": True}
+
+
 @app.get("/api/tasks/{id}")
-def read_tasks(session: SessionDep, id: int):
+def read_tasks(request: Request, session: SessionDep, id: int, current_user: UserSerializer = Depends(get_current_user)):
     return get_task_or_404(session=session, task=Task, id=id)
 
 
