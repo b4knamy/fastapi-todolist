@@ -1,11 +1,9 @@
 
 from enum import Enum
-from typing import Union
 from datetime import datetime
+from fastapi import HTTPException
+from sqlmodel import Field, SQLModel
 from utils import BaseModelSerializer, get_utc_now
-from database import Base, db_session, engine
-from sqlalchemy.orm import Mapped
-from sqlalchemy import Integer, String, Column, DateTime, Enum as EnumSQL
 
 
 # Cada tarefa deve ter os seguintes campos:
@@ -16,6 +14,29 @@ from sqlalchemy import Integer, String, Column, DateTime, Enum as EnumSQL
 # data_criacao (datetime, gerado automaticamente)
 # data_atualizacao (datetime, atualizado automaticamente)
 
+ALLOWED_STATES = ("Pendente", "Concluído", "Em andamento")
+ALLOWED_STATE_FILTER = ("pendente", "andamento", "concluido")
+
+
+class TaskStateValidation:
+
+    validation_error_message = {
+        "titulo": "Campo obrigatório",
+        "descricao": "Campo opcional",
+        "estado": f'Somente 3 valores: {ALLOWED_STATES}'
+    }
+
+    def is_state_valid(self, raise_error=False):
+        if not self.estado:
+            raise NotImplemented("Estado não está implementado.")
+
+        is_valid = self.estado in ALLOWED_STATES
+
+        if raise_error and not is_valid:
+            raise HTTPException(
+                status_code=400, detail={"estado": f'Somente 3 valores: {ALLOWED_STATES}'})
+        return is_valid
+
 
 class PossiveisEstados(str, Enum):
     pendente = "Pendente"
@@ -23,25 +44,31 @@ class PossiveisEstados(str, Enum):
     andamento = "Em andamento"
 
 
-class Task(Base):
-    __tablename__ = "tasks"
-
-    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
-    titulo = Column(String, nullable=False)
-    descricao: Mapped[str | None] = Column(String, nullable=True)
-    estado: Mapped[str] = Column(EnumSQL(PossiveisEstados), nullable=False)
-    data_criacao = Column(DateTime, default=get_utc_now, nullable=False)
-    data_atualizacao = Column(
-        DateTime, default=get_utc_now, onupdate=get_utc_now, nullable=False)
+class Task(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    titulo: str
+    descricao: str | None = None
+    estado: PossiveisEstados
+    data_criacao: datetime = Field(default_factory=get_utc_now)
+    data_atualizacao: datetime = Field(default_factory=get_utc_now)
 
 
 class TaskSerializer(BaseModelSerializer):
     id: int
     titulo: str
-    descricao: Union[str, None] = None
+    descricao: str | None
     estado: str
     data_criacao: datetime
     data_atualizacao: datetime
 
 
-Base.metadata.create_all(bind=engine)
+class TaskUpdate(BaseModelSerializer, TaskStateValidation):
+    titulo: str | None = None
+    descricao: str | None = None
+    estado: str | None = None
+
+
+class TaskCreate(BaseModelSerializer, TaskStateValidation):
+    titulo: str
+    descricao: str
+    estado: str
