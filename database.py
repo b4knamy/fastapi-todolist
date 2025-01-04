@@ -1,10 +1,22 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base, DeclarativeBase
+from sqlmodel import Session, create_engine, SQLModel
+from typing import Annotated
+from fastapi import Depends
 
-Base: DeclarativeBase = declarative_base()
-database_url = "sqlite+pysqlite:///./sqlite3.db"
-engine = create_engine(database_url, echo=True)
 
-start_session = sessionmaker(bind=engine)
+sqlite_file_name = "sqlite3.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
 
-db_session = start_session()
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args, echo=True)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
