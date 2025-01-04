@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Union
 from datetime import datetime
 from utils import BaseModelSerializer, get_utc_now
-from database import Base
+from database import Base, db_session, engine
 from sqlalchemy.orm import Mapped
 from sqlalchemy import Integer, String, Column, DateTime, Enum as EnumSQL
 
@@ -18,9 +18,9 @@ from sqlalchemy import Integer, String, Column, DateTime, Enum as EnumSQL
 
 
 class PossiveisEstados(str, Enum):
-    PENDENTE = "Pendente"
-    CONCLUIDO = "Concluído"
-    EM_ANDAMENTO = "Em andamento"
+    pendente = "Pendente"
+    concluido = "Concluído"
+    andamento = "Em andamento"
 
 
 class Task(Base):
@@ -42,3 +42,6 @@ class TaskSerializer(BaseModelSerializer):
     estado: str
     data_criacao: datetime
     data_atualizacao: datetime
+
+
+Base.metadata.create_all(bind=engine)
