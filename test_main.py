@@ -1,4 +1,5 @@
 
+from time import sleep
 from fastapi.testclient import TestClient
 import pytest
 from database import engine
@@ -364,6 +365,27 @@ def test_update_all_value_from_the_first_task():
     assert task["titulo"]
     assert task["descricao"]
     assert task["estado"]
+
+
+def test_update_and_check_updated_at():
+    response = client.post("/api/auth/token", data=fake_user)
+
+    response_json = response.json()
+
+    task_response = client.get("/api/tasks/1", headers={
+        "Authorization": f"Bearer {response_json["access_token"]}"
+    })
+    task_json: Task = task_response.json()
+
+    updated_response = client.patch("/api/tasks/1", json={
+        "titulo": "random title s"
+    }, headers={
+        "Authorization": f"Bearer {response_json["access_token"]}"
+    })
+
+    updated_json: Task = updated_response.json()
+
+    assert updated_json["data_atualizacao"] > task_json["data_criacao"]
 
 
 def test_error_when_setting_wrong_state_in_possible_values():
