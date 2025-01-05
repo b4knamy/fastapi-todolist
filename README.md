@@ -19,7 +19,7 @@ API de Gerenciamento de Tarefas com FastAPI
 
 
 - Comandos uteis da aplicação
-  * Rode os seguintes comandos no terminal *
+  * Abra outro terminal e rode os seguintes comandos *
 
   comando: docker exec -it app sh
   * Este comando irá entrar dentro do container app, onde poderá rodar commandos da aplicação *
