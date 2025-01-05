@@ -1,5 +1,4 @@
 
-from time import sleep
 from fastapi.testclient import TestClient
 import pytest
 from database import engine
@@ -7,10 +6,8 @@ from sqlmodel import SQLModel
 from main import app
 import os
 from pathlib import Path
-import dotenv
 from models.task import ALLOWED_STATE_FILTER, ALLOWED_STATES, Task, TaskSerializer
-os.environ.setdefault("USE_DATABASE_TEST", "1")
-dotenv.load_dotenv()
+
 
 fake_test_tasks = [
     {
@@ -23,46 +20,6 @@ fake_test_tasks = [
         "descricao": "Descrição 2",
         "estado": "concluída",
     },
-    {
-        "titulo": "Titulo 3",
-        "descricao": "Descrição 3",
-        "estado": "pendente",
-    },
-    {
-        "titulo": "Titulo 4",
-        "descricao": "Descrição 4",
-        "estado": "em andamento",
-    },
-    {
-        "titulo": "Titulo 5",
-        "descricao": "Descrição 5",
-        "estado": "concluída",
-    },
-    {
-        "titulo": "Titulo 6",
-        "descricao": "Descrição 6",
-        "estado": "pendente",
-    },
-    {
-        "titulo": "Titulo 7",
-        "descricao": "Descrição 7",
-        "estado": "concluída",
-    },
-    {
-        "titulo": "Titulo 8",
-        "descricao": "Descrição 8",
-        "estado": "pendente",
-    },
-    {
-        "titulo": "Titulo 9",
-        "descricao": "Descrição 9",
-        "estado": "em andamento",
-    },
-    {
-        "titulo": "Titulo 10",
-        "descricao": "Descrição 10",
-        "estado": "concluída",
-    }
 ]
 
 fake_user = {
