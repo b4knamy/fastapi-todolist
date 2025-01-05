@@ -5,8 +5,11 @@ from datetime import datetime, timezone
 from settings import JWT_EXPIRATION_TIME, PAGINATION_PER_PAGE, JWT_SECRET_KEY, JWT_HASH_ALGORITHM
 from fastapi import Depends, HTTPException
 from database import SessionDep, oauth_scheme
+from passlib.context import CryptContext
 from sqlmodel.sql._expression_select_cls import SelectOfScalar
 from jwt import encode, decode, ExpiredSignatureError, InvalidTokenError
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class BaseModelSerializer(BaseModel):
@@ -36,8 +39,6 @@ def get_task_or_404(session: SessionDep, task, id: int):
 def encode_user(payload: dict[str]):
     to_encode = payload.copy()
     to_encode["exp"] = get_utc_now() + JWT_EXPIRATION_TIME
-    print(to_encode)
-    print("\n\n")
     return encode(to_encode, key=JWT_SECRET_KEY,
                   algorithm=JWT_HASH_ALGORITHM)
 
@@ -57,3 +58,11 @@ def decode_user(token: str):
 
 def get_current_user(token: Annotated[str, Depends(oauth_scheme)]):
     return decode_user(token)
+
+
+def generate_hashed_pwd(password: str):
+    return pwd_context.hash(password)
+
+
+def check_hashed_pwd(plain: str, hashed: str):
+    return pwd_context.verify(plain, hashed)
