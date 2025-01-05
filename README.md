@@ -37,6 +37,6 @@ API de Gerenciamento de Tarefas com FastAPI
 
 
   
-- Documentação da API com Swagger em: http://0.0.0.0:8000/docs
+- Documentação da API com Swagger ficará disponivels após rodar a aplicação em: http://0.0.0.0:8000/docs
 
   
