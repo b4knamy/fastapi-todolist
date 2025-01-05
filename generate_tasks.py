@@ -24,4 +24,3 @@ if __name__ == "__main__":
 
             session.add(new_task)
             session.commit()
-    print("Random Tasks Generated!")
