@@ -9,9 +9,8 @@ import os
 parent_dir = Path(__file__).resolve().parent
 load_dotenv(parent_dir / ".env")
 
-is_test = os.environ.get("USE_DATABASE_TEST", 0)
-
-if is_test == 1:
+is_test = int(os.environ.get("USE_DATABASE_TEST", 0))
+if is_test:
     sqlite_url = os.environ.get(
         "TEST_DATABASE_URL", "sqlite:///sqlite3_test.db")
 else:
