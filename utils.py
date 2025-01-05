@@ -8,6 +8,7 @@ from database import SessionDep, oauth_scheme
 from passlib.context import CryptContext
 from sqlmodel.sql._expression_select_cls import SelectOfScalar
 from jwt import encode, decode, ExpiredSignatureError, InvalidTokenError
+from zoneinfo import ZoneInfo
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -17,7 +18,7 @@ class BaseModelSerializer(BaseModel):
 
 
 def get_utc_now():
-    return datetime.now(timezone.utc)
+    return datetime.now(ZoneInfo("America/Sao_Paulo"))
 
 
 def get_paginated_tasks(page: int, select_query: SelectOfScalar):
