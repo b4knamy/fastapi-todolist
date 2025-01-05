@@ -5,6 +5,7 @@ from database import engine
 from sqlmodel import SQLModel
 from main import app
 import os
+from main import cache
 from pathlib import Path
 from models.task import ALLOWED_STATE_FILTER, ALLOWED_STATES, Task, TaskSerializer
 from settings import PAGINATION_PER_PAGE
@@ -32,8 +33,18 @@ fake_user = {
 }
 
 
+@pytest.fixture(scope="function", autouse=True)
+def clear_cache():
+    cache.clear()
+
+
 @pytest.fixture(scope="session", autouse=True)
 def create_and_delete_test_db():
+    try:
+        os.remove(Path(__file__).resolve().parent / "sqlite3_test.db")
+    except FileNotFoundError:
+        pass
+
     SQLModel.metadata.create_all(engine)
     yield
     os.remove(Path(__file__).resolve().parent / "sqlite3_test.db")
