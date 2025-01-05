@@ -16,8 +16,8 @@ import models
 # data_criacao (datetime, gerado automaticamente)
 # data_atualizacao (datetime, atualizado automaticamente)
 
-ALLOWED_STATES = ("Pendente", "Concluído", "Em andamento")
-ALLOWED_STATE_FILTER = ("pendente", "andamento", "concluido")
+ALLOWED_STATES = ("pendente", "concluída", "em andamento")
+ALLOWED_STATE_FILTER = ("pendente", "andamento", "concluida")
 
 
 class TaskStateValidation:
@@ -25,7 +25,7 @@ class TaskStateValidation:
     validation_error_message = {
         "titulo": "Campo obrigatório",
         "descricao": "Campo opcional",
-        "estado": f'Somente 3 valores: {ALLOWED_STATES}'
+        "estado": f'Somente 3 valores possiveis: {ALLOWED_STATES}'
     }
 
     def is_state_valid(self, raise_error=False):
@@ -36,14 +36,14 @@ class TaskStateValidation:
 
         if raise_error and not is_valid:
             raise HTTPException(
-                status_code=400, detail={"estado": f'Somente 3 valores: {ALLOWED_STATES}'})
+                status_code=400, detail={"estado": f'Somente 3 valores possiveis: {ALLOWED_STATES}'})
         return is_valid
 
 
 class PossiveisEstados(str, Enum):
-    pendente = "Pendente"
-    concluido = "Concluído"
-    andamento = "Em andamento"
+    pendente = "pendente"
+    concluido = "concluída"
+    andamento = "em andamento"
 
 
 class Task(SQLModel, table=True):
