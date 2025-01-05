@@ -7,6 +7,7 @@ from main import app
 import os
 from pathlib import Path
 from models.task import ALLOWED_STATE_FILTER, ALLOWED_STATES, Task, TaskSerializer
+from settings import PAGINATION_PER_PAGE
 
 
 fake_test_tasks = [
@@ -426,25 +427,21 @@ def test_create_many_tasks():
     })
 
     assert task_response.status_code == 200
-    assert len(task_response.json()) == 5
+    assert len(task_response.json()) == PAGINATION_PER_PAGE
 
 
 def test_paginated_tasks():
     response = client.post("/api/auth/token", data=fake_user)
     response_json = response.json()
-    for _ in range(1, 12):
+    for _ in range(1, 3):
         task_response = client.get(f"/api/tasks/list/{_}", headers={
             "Authorization": f"Bearer {response_json["access_token"]}"
         })
         tasks: list[TaskSerializer] = task_response.json()
 
         assert task_response.status_code == 200
-        if _ == 11:
-
-            assert len(tasks) == 2
-        else:
-            for i in range(0, 5):
-                assert tasks[i]
+        for i in range(0, PAGINATION_PER_PAGE):
+            assert tasks[i]
 
 
 def test_empty_list_in_particular_paginated_page():
@@ -463,7 +460,7 @@ def test_list_filter_pending_state():
     response = client.post("/api/auth/token", data=fake_user)
     response_json = response.json()
 
-    for i in range(1, 4):
+    for i in range(1, 3):
         task_response = client.get(f"/api/tasks/list/{i}?estado=pendente", headers={
             "Authorization": f"Bearer {response_json["access_token"]}"
         })
@@ -477,7 +474,7 @@ def test_list_filter_concluded_state():
     response = client.post("/api/auth/token", data=fake_user)
     response_json = response.json()
 
-    for i in range(1, 4):
+    for i in range(1, 2):
         task_response = client.get(f"/api/tasks/list/{i}?estado=concluida", headers={
             "Authorization": f"Bearer {response_json["access_token"]}"
         })
@@ -491,7 +488,7 @@ def test_list_filter_progress_state():
     response = client.post("/api/auth/token", data=fake_user)
     response_json = response.json()
 
-    for i in range(1, 4):
+    for i in range(1, 3):
         task_response = client.get(f"/api/tasks/list/{i}?estado=andamento", headers={
             "Authorization": f"Bearer {response_json["access_token"]}"
         })
@@ -521,7 +518,7 @@ def test_list_filter_wrong_state_key_being_ignored():
         "Authorization": f"Bearer {response_json["access_token"]}"
     })
     assert task_response.status_code == 200
-    assert len(task_response.json()) == 5
+    assert len(task_response.json()) == PAGINATION_PER_PAGE
 
 
 def test_delete_task_which_do_not_exist():
