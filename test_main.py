@@ -75,7 +75,6 @@ fake_user = {
 
 @pytest.fixture(scope="session", autouse=True)
 def create_and_delete_test_db():
-    # os.environ.setdefault("USE_DATABASE_TEST", "1")
     SQLModel.metadata.create_all(engine)
     yield
     os.remove(Path(__file__).resolve().parent / "sqlite3_test.db")
