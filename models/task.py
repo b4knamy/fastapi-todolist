@@ -2,10 +2,8 @@
 from enum import Enum
 from datetime import datetime
 from fastapi import HTTPException
-from sqlmodel import Field, Relationship, SQLModel
-from models.user import User
+from sqlmodel import Field, SQLModel
 from utils import BaseModelSerializer, get_utc_now
-import models
 
 
 # Cada tarefa deve ter os seguintes campos:
@@ -53,7 +51,8 @@ class Task(SQLModel, table=True):
     descricao: str | None = None
     estado: PossiveisEstados
     data_criacao: datetime = Field(default_factory=get_utc_now)
-    data_atualizacao: datetime = Field(default_factory=get_utc_now)
+    data_atualizacao: datetime = Field(
+        default_factory=get_utc_now, sa_column_kwargs={"onupdate": get_utc_now})
 
 
 class TaskSerializer(BaseModelSerializer):
