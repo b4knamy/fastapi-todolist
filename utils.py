@@ -54,7 +54,7 @@ def decode_user(token: str):
     except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Token invalido")
     except Exception:
-        raise HTTPException(status_code=400, detail="Algo deu errado!")
+        raise HTTPException(status_code=401, detail="Acesso negado!")
 
 
 def get_current_user(token: Annotated[str, Depends(oauth_scheme)]):
