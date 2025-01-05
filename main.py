@@ -15,8 +15,6 @@ from cachetools import TTLCache
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Adjust Redis URL if needed
-
     create_db_and_tables()
     yield
 
